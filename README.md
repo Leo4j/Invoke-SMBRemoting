@@ -1,7 +1,7 @@
 # Invoke-RCE
 A script to gain an interactive shell (Remote-Command-Execution) over a target system
 
-Note: The user you run the script as needs to be administrator over the target system
+Note: The user you run the script as (client) needs to be administrator over the target system (server)
 
 Run the same script on the target and client system as follows:
 
