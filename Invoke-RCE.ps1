@@ -10,16 +10,16 @@ function Invoke-RCE {
 	A script to gain an interactive shell (Remote-Command-Execution) over a target system
 	
 	.PARAMETER Client
-	Specify the target domain (default: current domain)
+	Switch to run the script as the Client
 	
 	.PARAMETER Server
-	Specify the Domain Controller (default: will try to enumerate the DC)
+	Switch to run the script as the Server
 	
 	.PARAMETER PipeName
-	Specify the target domain
+	Specify the PipeName (needs to match on both Client and Server)
 	
 	.PARAMETER Target
-	Do the same process using each of the user/computer accounts we successfully owned
+	The Server HostName or IP to connect to
 	
 	.EXAMPLE
 	# Server
