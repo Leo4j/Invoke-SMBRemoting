@@ -8,6 +8,8 @@ function Invoke-RCE {
 
 	.DESCRIPTION
 	A script to gain an interactive shell (Remote-Command-Execution) over a target system
+        The script must be run on both Target (Server) and local machine (Client)
+	The user you run the script as Client needs to be Administrator over the target (Server)
 	
 	.PARAMETER Client
 	Switch to run the script as the Client
