@@ -1,8 +1,6 @@
 # Invoke-RCE
 A script to gain an interactive shell (Remote-Command-Execution) over a target system
 
-Note: The user you run the script as (client) needs to be administrator over the target system (server)
-
 Run the same script on the target and client system as follows:
 
 ```
@@ -18,6 +16,9 @@ Invoke-RCE -Server -PipeName Something
 ```
 
 ### Client
+
+Note: The user you run the script as (client) needs to be administrator over the target system (server)
+
 ```
 Invoke-RCE -Client -Target "Workstation-01.ferrari.local"
 ```
