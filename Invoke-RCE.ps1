@@ -1,5 +1,37 @@
 function Invoke-RCE {
 
+	<#
+
+	.SYNOPSIS
+	Invoke-RCE Author: Rob LP (@L3o4j)
+	https://github.com/Leo4j/Invoke-RCE
+
+	.DESCRIPTION
+	A script to gain an interactive shell (Remote-Command-Execution) over a target system
+	
+	.PARAMETER Client
+	Specify the target domain (default: current domain)
+	
+	.PARAMETER Server
+	Specify the Domain Controller (default: will try to enumerate the DC)
+	
+	.PARAMETER PipeName
+	Specify the target domain
+	
+	.PARAMETER Target
+	Do the same process using each of the user/computer accounts we successfully owned
+	
+	.EXAMPLE
+	# Server
+ 	Invoke-RCE -Server
+	Invoke-RCE -Server -PipeName Something
+
+ 	# Client
+	Invoke-RCE -Client -Target "Workstation-01.ferrari.local"
+ 	Invoke-RCE -Client -Target "Workstation-01.ferrari.local" -PipeName Something
+	
+	#>
+
 	param (
 		[switch]$Client,
 		[switch]$Server,
