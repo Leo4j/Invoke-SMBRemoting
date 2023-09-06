@@ -1,5 +1,5 @@
 # Invoke-RCE
-A script to gain an interactive shell (Remote-Command-Execution) over a target system
+Remote-Command-Execution over NamedPipes
 
 Run the same script on the target and client system as follows:
 
