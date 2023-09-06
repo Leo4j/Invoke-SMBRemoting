@@ -1,5 +1,5 @@
 function Invoke-RCE {
-
+	
 	<#
 
 	.SYNOPSIS
@@ -35,18 +35,16 @@ function Invoke-RCE {
 	param (
 		[switch]$Client,
 		[switch]$Server,
-		[string]$PipeName,
+		[string]$PipeName = "MyUniquePipeName",  # Default value set here
 		[string]$Target
 	)
 	
-	#$ErrorActionPreference = "SilentlyContinue"
-	#$WarningPreference = "SilentlyContinue"
+	$ErrorActionPreference = "SilentlyContinue"
+	$WarningPreference = "SilentlyContinue"
 	
-	if($Server){
-		if($PipeName){$pipe = $PipeName}
-		else{$pipe = "MyUniquePipeName"}
+	if ($Server) {
 
-		$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream($pipe, 'InOut', 1, 'Byte', 'None', 1024, 1024, $null)
+		$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream($PipeName, 'InOut', 1, 'Byte', 'None', 1024, 1024, $null)
 
 		$pipeServer.WaitForConnection()
 
@@ -79,18 +77,15 @@ function Invoke-RCE {
 		$pipeServer.Disconnect()
 		$sr.Close()
 		$sw.Close()
-	}
-	
-	elseif($Client){
-		if($pipe){$pipe = $PipeName}
-		else{$pipe = "MyUniquePipeName"}
+
+	} elseif ($Client) {
 		
-		if($Target){$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$Target", $pipe, 'InOut')}
-		else{
+		if (-not $Target) {
 			Write-Output "Please specify a target"
-			break
+			return
 		}
-		
+
+		$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$Target", $PipeName, 'InOut')
 		$pipeClient.Connect()
 
 		$sr = New-Object System.IO.StreamReader($pipeClient)
@@ -122,5 +117,4 @@ function Invoke-RCE {
 		$sr.Close()
 		$sw.Close()
 	}
-
 }
