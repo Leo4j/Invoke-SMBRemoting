@@ -1,5 +1,5 @@
 # Invoke-RCE
-Remote-Command-Execution over NamedPipes
+Remote-Command-Execution over Named-Pipes
 
 Run the same script on the target and client system as follows:
 
