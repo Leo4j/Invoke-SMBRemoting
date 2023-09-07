@@ -100,7 +100,8 @@ function Invoke-RCE {
 			$sw.Flush()
 
 			if ($userCommand -eq "exit") {
-				break
+				Write-Output ""
+    				break
 			}
 
 			$serverOutput = ""
@@ -109,6 +110,7 @@ function Invoke-RCE {
 
 				if ($line -eq "###END###") {  # Check for the delimiter
 					Write-Output $serverOutput.Trim()  # Print the entire result at once
+     					Write-Output ""
 					break
 				} else {
 					$serverOutput += "$line`n"  # Accumulate the output until the delimiter is found
