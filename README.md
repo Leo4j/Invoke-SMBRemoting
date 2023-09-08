@@ -19,7 +19,7 @@ Invoke-SMBRemoting -Target "Workstation-01.ferrari.local"
 Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 ```
 
-### Execute a Command
+### Command Execution
 ```
 Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -Command whoami
 ```
