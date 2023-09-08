@@ -114,7 +114,7 @@ while (`$true) {
 	Write-Output ""
 	Write-Output " [+] Service Name: $ServiceName"
 	Write-Output ""
-	Write-Output " [+] Creating Service... Please Wait..."
+	Write-Output " [+] Creating Service on Remote Target..."
 	Write-Output ""
 	
 	# Get the current process ID
