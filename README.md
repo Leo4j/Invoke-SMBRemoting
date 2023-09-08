@@ -1,5 +1,5 @@
 # Invoke-SMBRemoting
-Command Execution or Interactive Shell over Named-Pipes
+Command Execution or Interactive Shell over Named-Pipes (SMB)
 
 Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the target machine, and sends commands (and receives outputs) using Named Pipes.
 
