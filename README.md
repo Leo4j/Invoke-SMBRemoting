@@ -1,28 +1,32 @@
-# Invoke-RCE
-Remote-Command-Execution over Named-Pipes
+# Invoke-SMBRemoting
+Single Command Execution or Interactive Shell over Named-Pipes
+
+Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the target machine, and sends commands (and receives outputs) using Named Pipes.
+
+It begins by initiating a temporary service on the target system. On session completion (or upon receiving an exit command), the tool executes a disconnection procedure, terminating the temporary service on the target. An integrated monitoring system ensures the service's deletion if the session unexpectedly terminates.
 
 Run the same script on the target and client system as follows:
 
 ```
-iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-RCE/main/Invoke-RCE.ps1')
+iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/main/Invoke-SMBRemoting.ps1')
 ```
 
-### Server
+### Interactive Shell
 ```
-Invoke-RCE -Server
+Invoke-SMBRemoting -Target "Workstation-01.ferrari.local"
 ```
 ```
-Invoke-RCE -Server -PipeName Something
+Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 ```
 
-### Client
+### Execute a Command
+```
+Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -Command whoami
+```
+```
+Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+```
 
-Note: The user you run the script as (client) needs to be administrator over the target system (server)
+Note: The user you run the script as needs to be administrator over the target system
 
-```
-Invoke-RCE -Client -Target "Workstation-01.ferrari.local"
-```
-```
-Invoke-RCE -Client -Target "Workstation-01.ferrari.local" -PipeName Something
-```
-![image](https://github.com/Leo4j/Invoke-RCE/assets/61951374/12d296ab-aa18-4897-9a28-ade999921d4a)
+![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/8415c30a-14f8-44a8-b3f4-840fbebc3c4e)
