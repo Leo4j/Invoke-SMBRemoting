@@ -7,7 +7,7 @@ It begins by initiating a temporary service on the target system. On session com
 
 Note: The user you run the script as needs to be administrator over the target system
 
-Run the same script on the target and client system as follows:
+Run as follows:
 
 ```
 iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/main/Invoke-SMBRemoting.ps1')
