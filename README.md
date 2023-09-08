@@ -30,3 +30,6 @@ Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -S
 Note: The user you run the script as needs to be administrator over the target system
 
 ![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/8415c30a-14f8-44a8-b3f4-840fbebc3c4e)
+
+![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/4c5b39de-dc03-4bcb-952d-9acc0f61090b)
+
