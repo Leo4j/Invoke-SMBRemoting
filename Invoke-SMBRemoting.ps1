@@ -7,7 +7,7 @@ function Invoke-SMBRemoting {
 	https://github.com/Leo4j/Invoke-SMBRemoting
 
 	.DESCRIPTION
-	Get Command-Execution or an Interactive Shell over Named-Pipes
+	Single Command Execution or Interactive Shell over Named-Pipes
 	The user you run the script as needs to be Administrator over the target
 	
 	.PARAMETER Target
