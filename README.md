@@ -15,21 +15,20 @@ iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/
 
 ### Interactive Shell
 ```
-Invoke-SMBRemoting -Target "Workstation-01.ferrari.local"
+Enter-SMBSession -ComputerName "Workstation-01.ferrari.local"
 ```
 ```
-Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
+Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 ```
-
-![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/8415c30a-14f8-44a8-b3f4-840fbebc3c4e)
 
 ### Command Execution
 ```
-Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -Command whoami
+Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command whoami
 ```
 ```
-Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
 ```
 
-![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/4c5b39de-dc03-4bcb-952d-9acc0f61090b)
+![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/5262c28a-f375-42ef-8f59-ddceb2edad8a)
+
 
