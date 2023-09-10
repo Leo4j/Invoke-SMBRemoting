@@ -1,4 +1,4 @@
-function Invoke-SMBRemoting {
+function Enter-SMBSession {
 	
 	<#
 
@@ -8,9 +8,9 @@ function Invoke-SMBRemoting {
 
 	.DESCRIPTION
 	Command Execution or Interactive Shell over Named-Pipes
-	The user you run the script as needs to be Administrator over the target
+	The user you run the script as needs to be Administrator over the ComputerName
 	
-	.PARAMETER Target
+	.PARAMETER ComputerName
 	The Server HostName or IP to connect to
 	
 	.PARAMETER PipeName
@@ -22,26 +22,31 @@ function Invoke-SMBRemoting {
 	.PARAMETER Command
 	Specify a command to run instead of getting a Shell
 	
+	.PARAMETER Verbose
+	Show Pipe and Service Name info
+	
 	.EXAMPLE
-	Invoke-SMBRemoting -Target "Workstation-01.ferrari.local"
-	Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -Command whoami
- 	Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
-	Invoke-SMBRemoting -Target "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local"
+	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command whoami
+ 	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
+	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
 	
 	#>
 
 	param (
 		[string]$PipeName,
-		[string]$Target,
+		[string]$ComputerName,
 		[string]$ServiceName,
-		[string]$Command
+		[string]$Command,
+		[switch]$Verbose
 	)
 	
 	$ErrorActionPreference = "SilentlyContinue"
 	$WarningPreference = "SilentlyContinue"
+	Set-Variable MaximumHistoryCount 32767
 	
-	if (-not $Target) {
-		Write-Output " [-] Please specify a target"
+	if (-not $ComputerName) {
+		Write-Output " [-] Please specify a Target"
 		return
 	}
 	
@@ -99,9 +104,9 @@ while (`$true) {
 	
 	$b64command = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($FullCommand))
 	
-	$arguments = "\\$Target create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $b64command`""
+	$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $b64command`""
 	
-	$startarguments = "\\$Target start $ServiceName"
+	$startarguments = "\\$ComputerName start $ServiceName"
 	
 	Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
 	
@@ -109,12 +114,14 @@ while (`$true) {
 	
 	Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
 	
-	Write-Output ""
-	Write-Output " [+] Pipe Name: $PipeName"
-	Write-Output ""
-	Write-Output " [+] Service Name: $ServiceName"
-	Write-Output ""
-	Write-Output " [+] Creating Service on Remote Target..."
+	if($Verbose){
+		Write-Output ""
+		Write-Output " [+] Pipe Name: $PipeName"
+		Write-Output ""
+		Write-Output " [+] Service Name: $ServiceName"
+		Write-Output ""
+		Write-Output " [+] Creating Service on Remote Target..."
+	}
 	Write-Output ""
 	
 	# Get the current process ID
@@ -123,7 +130,7 @@ while (`$true) {
 	# Embedded monitoring script
 	$monitoringScript = @"
 `$serviceToDelete = "$ServiceName" # Name of the service you want to delete
-`$TargetServer = "$Target"
+`$TargetServer = "$ComputerName"
 `$primaryScriptProcessId = $currentPID
 
 while (`$true) {
@@ -146,7 +153,7 @@ while (`$true) {
 	# Execute the embedded monitoring script in a hidden window
 	Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -enc $b64monitoringScript" -WindowStyle Hidden
 	
-	$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$Target", $PipeName, 'InOut')
+	$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$ComputerName", $PipeName, 'InOut')
 	$pipeClient.Connect()
 
 	$sr = New-Object System.IO.StreamReader($pipeClient)
@@ -162,7 +169,6 @@ while (`$true) {
 			while ($true) {
 				$line = $sr.ReadLine()
 				if ($line -eq "###END###") {
-					Write-Output ""
 					Write-Output $serverOutput.Trim()
 					Write-Output ""
 					return
@@ -192,7 +198,7 @@ while (`$true) {
 					}
 				}
 				
-				$computerNameOnly = $Target -split '\.' | Select-Object -First 1
+				$computerNameOnly = $ComputerName -split '\.' | Select-Object -First 1
 				$promptString = "[$computerNameOnly]: PS $remotePath> "
 				Write-Host -NoNewline $promptString
 				$userCommand = [Console]::ReadLine()
@@ -224,7 +230,7 @@ while (`$true) {
 	}
 	
 	finally{
-		$stoparguments = "\\$Target delete $ServiceName"
+		$stoparguments = "\\$ComputerName delete $ServiceName"
 		Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
 		if ($sw) { $sw.Close() }
 		if ($sr) { $sr.Close() }
