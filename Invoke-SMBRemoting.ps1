@@ -154,7 +154,7 @@ while (`$true) {
 	Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -enc $b64monitoringScript" -WindowStyle Hidden
 	
 	$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$ComputerName", $PipeName, 'InOut')
-	$pipeClient.Connect(4096)
+	$pipeClient.Connect(30000)
 
 	$sr = New-Object System.IO.StreamReader($pipeClient)
 	$sw = New-Object System.IO.StreamWriter($pipeClient)
