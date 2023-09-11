@@ -63,7 +63,7 @@ function Enter-SMBSession {
 	}
 	
 	$ServerScript = @"
-`$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream("$PipeName", 'InOut', 1, 'Byte', 'None', 1024, 1024, `$null)
+`$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream("$PipeName", 'InOut', 1, 'Byte', 'None', 4096, 4096, `$null)
 
 `$pipeServer.WaitForConnection()
 
@@ -154,7 +154,7 @@ while (`$true) {
 	Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -enc $b64monitoringScript" -WindowStyle Hidden
 	
 	$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$ComputerName", $PipeName, 'InOut')
-	$pipeClient.Connect()
+	$pipeClient.Connect(4096)
 
 	$sr = New-Object System.IO.StreamReader($pipeClient)
 	$sw = New-Object System.IO.StreamWriter($pipeClient)
@@ -201,7 +201,7 @@ while (`$true) {
 				$computerNameOnly = $ComputerName -split '\.' | Select-Object -First 1
 				$promptString = "[$computerNameOnly]: PS $remotePath> "
 				Write-Host -NoNewline $promptString
-				$userCommand = [Console]::ReadLine()
+				$userCommand = Read-Host
 				$fullCommand = "$userCommand | Out-String"
 				$sw.WriteLine($fullCommand)
 				$sw.Flush()
