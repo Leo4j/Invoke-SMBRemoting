@@ -73,20 +73,25 @@ function Enter-SMBSession {
 
 while (`$true) {
 	`$command = `$sr.ReadLine()
+	
+	`$host.UI.RawUI.BufferSize = New-Object Management.Automation.Host.Size(4096, `$Host.UI.RawUI.BufferSize.Height)
 
 	if (`$command -eq "exit") {
 		`$sw.WriteLine("Exiting...")
 		`$sw.Flush()
 		break
-	} else {
-		`$result = Invoke-Expression `$command
+	} 
+	
+	else {
+		try{
+			`$result = Invoke-Expression `$command | Out-String
 
-		if (`$result -is [System.Array]) {
-			foreach (`$line in `$result) {
-				`$sw.WriteLine(`$line)
-			}
-		} else {
-			`$sw.WriteLine(`$result)
+			`$result -split "`n" | ForEach-Object {`$sw.WriteLine(`$_.Trim())}
+		} 
+		
+		catch {
+			`$errorMessage = `$_.Exception.Message
+			`$sw.WriteLine(`$errorMessage)
 		}
 
 		`$sw.WriteLine("###END###")  # Delimiter indicating end of command result
@@ -175,7 +180,7 @@ while (`$true) {
 	
 	try{
 		if ($Command) {
-			$fullCommand = "$Command | Out-String"
+			$fullCommand = "$Command 2>&1 | Out-String"
 			$sw.WriteLine($fullCommand)
 			$sw.Flush()
 			while ($true) {
@@ -193,8 +198,8 @@ while (`$true) {
 		else {
 			while ($true) {
 				
-				# First, fetch the current remote path
-				$sw.WriteLine("(Get-Location).Path | Out-String")
+				# Fetch the actual remote prompt
+				$sw.WriteLine("prompt | Out-String")
 				$sw.Flush()
 				
 				$remotePath = ""
@@ -211,16 +216,23 @@ while (`$true) {
 				}
 				
 				$computerNameOnly = $ComputerName -split '\.' | Select-Object -First 1
-				$promptString = "[$computerNameOnly]: PS $remotePath> "
+				$promptString = "[$computerNameOnly]: $remotePath "
 				Write-Host -NoNewline $promptString
 				$userCommand = Read-Host
-				$fullCommand = "$userCommand | Out-String"
-				$sw.WriteLine($fullCommand)
-				$sw.Flush()
-
+				
 				if ($userCommand -eq "exit") {
 					Write-Output ""
 					break
+				}
+				
+				elseif($userCommand -ne ""){
+					$fullCommand = "$userCommand 2>&1 | Out-String"
+					$sw.WriteLine($fullCommand)
+					$sw.Flush()
+				}
+				
+				else{
+					continue
 				}
 				
 				Write-Output ""
