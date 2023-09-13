@@ -28,6 +28,7 @@ function Enter-SMBSession {
 	.EXAMPLE
 	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local"
 	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command whoami
+	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all"
  	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
 	
