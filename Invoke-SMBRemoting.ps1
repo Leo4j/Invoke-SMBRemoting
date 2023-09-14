@@ -87,7 +87,7 @@ while (`$true) {
 		try{
 			`$result = Invoke-Expression `$command | Out-String
 
-			`$result -split "`n" | ForEach-Object {`$sw.WriteLine(`$_.Trim())}
+			`$result -split "`n" | ForEach-Object {`$sw.WriteLine(`$_.TrimEnd())}
 		} 
 		
 		catch {
