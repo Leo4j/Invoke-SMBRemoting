@@ -152,6 +152,9 @@ while (`$true) {
 		Start-Process sc.exe -ArgumentList `$stoparguments -WindowStyle Hidden
 		break # Exit the monitoring script
 	}
+
+ 	# Exit the script after cleaning up
+	exit
 }
 "@
 	
