@@ -73,6 +73,12 @@ function Enter-SMBSession {
 `$sw = New-Object System.IO.StreamWriter(`$pipeServer)
 
 while (`$true) {
+
+	# Check if client is still connected. If not, break.
+	if (-not `$pipeServer.IsConnected) {
+		break
+	}
+
 	`$command = `$sr.ReadLine()
 	
 	`$host.UI.RawUI.BufferSize = New-Object Management.Automation.Host.Size(4096, `$Host.UI.RawUI.BufferSize.Height)
