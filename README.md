@@ -3,8 +3,6 @@ Interactive Shell and Command Execution over Named-Pipes (SMB)
 
 Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the target machine, and sends commands (and receives outputs) using Named Pipes.
 
-It begins by initiating a temporary service on the target system. On session completion (or upon receiving an exit command), the tool executes a disconnection procedure, terminating the temporary service on the target. An integrated monitoring system ensures the service's deletion if the session unexpectedly terminates.
-
 Note: The user you run the script as needs to be administrator over the target system
 
 Run as follows:
