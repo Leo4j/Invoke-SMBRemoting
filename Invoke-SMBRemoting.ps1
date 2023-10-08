@@ -98,7 +98,7 @@ while (`$true) {
 		
 		catch {
 			`$errorMessage = `$_.Exception.Message
-			`$sw.WriteLine(`$errorMessage)
+			`$sw.WriteLine("###ERROR###" + `$errorMessage)
 		}
 
 		`$sw.WriteLine("###END###")  # Delimiter indicating end of command result
@@ -133,7 +133,7 @@ while (`$true) {
 		Write-Output ""
 		Write-Output " [+] Creating Service on Remote Target..."
 	}
-	Write-Output ""
+	#Write-Output ""
 	
 	# Get the current process ID
 	$currentPID = $PID
@@ -240,7 +240,7 @@ while (`$true) {
 					continue
 				}
 				
-				Write-Output ""
+				#Write-Output ""
 
 				$serverOutput = ""
 				while ($true) {
@@ -250,6 +250,10 @@ while (`$true) {
 						Write-Output $serverOutput.Trim()
 						Write-Output ""
 						break
+					} elseif ($line.StartsWith("###ERROR###")) {
+						# This is an error, so write it in red
+						$errorLine = $line -replace "###ERROR###", ""
+						Write-Host $errorLine -ForegroundColor Red
 					} else {
 						$serverOutput += "$line`n"
 					}
