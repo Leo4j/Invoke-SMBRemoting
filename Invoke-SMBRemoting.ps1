@@ -194,6 +194,10 @@ while (`$true) {
 					Write-Output $serverOutput.Trim()
 					Write-Output ""
 					return
+				} elseif ($line.StartsWith("###ERROR###")) {
+					# This is an error, so write it in red
+					$errorLine = $line -replace "###ERROR###", ""
+					Write-Host $errorLine -ForegroundColor Red
 				} else {
 					$serverOutput += "$line`n"
 				}
