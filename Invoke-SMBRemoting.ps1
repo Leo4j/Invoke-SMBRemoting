@@ -107,8 +107,6 @@ while (`$true) {
 }
 
 `$pipeServer.Disconnect()
-`$sr.Close()
-`$sw.Close()
 "@
 	
 	$B64ServerScript = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($ServerScript))
