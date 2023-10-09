@@ -236,7 +236,7 @@ while (`$true) {
 					continue
 				}
 				
-				Write-Output ""
+				#Write-Output ""
 
 				$serverOutput = ""
 				while ($true) {
