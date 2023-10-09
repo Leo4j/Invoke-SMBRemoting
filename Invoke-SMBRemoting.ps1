@@ -92,13 +92,13 @@ while (`$true) {
 	else {
 		try{
 			`$result = Invoke-Expression `$command | Out-String
-
+			
 			`$result -split "`n" | ForEach-Object {`$sw.WriteLine(`$_.TrimEnd())}
 		} 
 		
 		catch {
 			`$errorMessage = `$_.Exception.Message
-			`$sw.WriteLine(`$errorMessage)
+			`$sw.WriteLine("###ERROR###" + `$errorMessage)
 		}
 
 		`$sw.WriteLine("###END###")  # Delimiter indicating end of command result
@@ -133,7 +133,7 @@ while (`$true) {
 		Write-Output ""
 		Write-Output " [+] Creating Service on Remote Target..."
 	}
-	Write-Output ""
+	#Write-Output ""
 	
 	# Get the current process ID
 	$currentPID = $PID
@@ -185,17 +185,30 @@ while (`$true) {
 	
 	try{
 		if ($Command) {
-			$fullCommand = "$Command 2>&1 | Out-String"
+			$fullCommand = "$Command 2>&1 | % { if (`$_.GetType().Name -eq 'ErrorRecord') { '###ERROR###' + `$_.Exception.Message } else { `$_ } } | Out-String"
 			$sw.WriteLine($fullCommand)
 			$sw.Flush()
+			$isError = $false
 			while ($true) {
 				$line = $sr.ReadLine()
 				if ($line -eq "###END###") {
-					Write-Output $serverOutput.Trim()
+					if (!$isError) {
+						Write-Output $serverOutput.Trim()
+					}
 					Write-Output ""
+					$isError = $false
 					return
+				} elseif ($line.StartsWith("###ERROR###")) {
+					$isError = $true
+					# This is an error, so write it in red
+					$errorLine = $line -replace "###ERROR###", ""
+					Write-Host $errorLine -ForegroundColor Red
 				} else {
-					$serverOutput += "$line`n"
+					if ($isError) {
+						Write-Host $line -ForegroundColor Red
+					} else {
+						$serverOutput += "$line`n"
+					}
 				}
 			}
 		} 
@@ -231,7 +244,8 @@ while (`$true) {
 				}
 				
 				elseif($userCommand -ne ""){
-					$fullCommand = "$userCommand 2>&1 | Out-String"
+					$fullCommand = "$userCommand 2>&1 | % { if (`$_.GetType().Name -eq 'ErrorRecord') { '###ERROR###' + `$_.Exception.Message } else { `$_ } } | Out-String"
+
 					$sw.WriteLine($fullCommand)
 					$sw.Flush()
 				}
@@ -240,18 +254,31 @@ while (`$true) {
 					continue
 				}
 				
-				Write-Output ""
-
+				#Write-Output ""
+				
+				$isError = $false
 				$serverOutput = ""
 				while ($true) {
 					$line = $sr.ReadLine()
 
 					if ($line -eq "###END###") {
-						Write-Output $serverOutput.Trim()
+						if (!$isError) {
+							Write-Output $serverOutput.Trim()
+						}
 						Write-Output ""
+						$isError = $false
 						break
+					} elseif ($line.StartsWith("###ERROR###")) {
+						# This is an error, so write it in red
+						$isError = $true
+						$errorLine = $line -replace "###ERROR###", ""
+						Write-Host $errorLine -ForegroundColor Red
 					} else {
-						$serverOutput += "$line`n"
+						if ($isError) {
+							Write-Host $line -ForegroundColor Red
+						} else {
+							$serverOutput += "$line`n"
+						}
 					}
 				}
 			}
