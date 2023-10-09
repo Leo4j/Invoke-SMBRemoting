@@ -8,7 +8,7 @@ Note: The user you run the script as needs to be administrator over the target s
 Run as follows:
 
 ```
-iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/main/Invoke-SMBRemoting.ps1')
+iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/dev/Invoke-SMBRemoting.ps1')
 ```
 
 ### Interactive Shell
