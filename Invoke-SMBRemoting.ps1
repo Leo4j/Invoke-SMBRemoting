@@ -166,88 +166,88 @@ while (`$true) {
 
 	$serverOutput = ""
 	
-	try{
-		if ($Command) {
-			$fullCommand = "$Command 2>&1 | Out-String"
-			$sw.WriteLine($fullCommand)
+	if ($Command) {
+		$fullCommand = "$Command 2>&1 | Out-String"
+		$sw.WriteLine($fullCommand)
+		$sw.Flush()
+		while ($true) {
+			$line = $sr.ReadLine()
+			if ($line -eq "###END###") {
+				Write-Output $serverOutput.Trim()
+				Write-Output ""
+				return
+			} else {
+				$serverOutput += "$line`n"
+			}
+		}
+	} 
+	
+	else {
+		while ($true) {
+			
+			# Fetch the actual remote prompt
+			$sw.WriteLine("prompt | Out-String")
 			$sw.Flush()
+			
+			$remotePath = ""
 			while ($true) {
 				$line = $sr.ReadLine()
+
+				if ($line -eq "###END###") {
+					# Remove any extraneous whitespace, newlines etc.
+					$remotePath = $remotePath.Trim()
+					break
+				} else {
+					$remotePath += "$line`n"
+				}
+			}
+			
+			$computerNameOnly = $ComputerName -split '\.' | Select-Object -First 1
+			$promptString = "[$computerNameOnly]: $remotePath "
+			Write-Host -NoNewline $promptString
+			$userCommand = Read-Host
+			
+			if ($userCommand -eq "exit") {
+				Write-Output ""
+					$sw.WriteLine("exit")
+				$sw.Flush()
+				break
+			}
+			
+			elseif($userCommand -ne ""){
+				$fullCommand = "$userCommand 2>&1 | Out-String"
+				$sw.WriteLine($fullCommand)
+				$sw.Flush()
+			}
+			
+			else{
+				continue
+			}
+			
+			#Write-Output ""
+
+			$serverOutput = ""
+			while ($true) {
+				$line = $sr.ReadLine()
+
 				if ($line -eq "###END###") {
 					Write-Output $serverOutput.Trim()
 					Write-Output ""
-					return
+					break
 				} else {
 					$serverOutput += "$line`n"
 				}
 			}
-		} 
-		
-		else {
-			while ($true) {
-				
-				# Fetch the actual remote prompt
-				$sw.WriteLine("prompt | Out-String")
-				$sw.Flush()
-				
-				$remotePath = ""
-				while ($true) {
-					$line = $sr.ReadLine()
-
-					if ($line -eq "###END###") {
-						# Remove any extraneous whitespace, newlines etc.
-						$remotePath = $remotePath.Trim()
-						break
-					} else {
-						$remotePath += "$line`n"
-					}
-				}
-				
-				$computerNameOnly = $ComputerName -split '\.' | Select-Object -First 1
-				$promptString = "[$computerNameOnly]: $remotePath "
-				Write-Host -NoNewline $promptString
-				$userCommand = Read-Host
-				
-				if ($userCommand -eq "exit") {
-					Write-Output ""
-     					$sw.WriteLine("exit")
-					$sw.Flush()
-					break
-				}
-				
-				elseif($userCommand -ne ""){
-					$fullCommand = "$userCommand 2>&1 | Out-String"
-					$sw.WriteLine($fullCommand)
-					$sw.Flush()
-				}
-				
-				else{
-					continue
-				}
-				
-				#Write-Output ""
-
-				$serverOutput = ""
-				while ($true) {
-					$line = $sr.ReadLine()
-
-					if ($line -eq "###END###") {
-						Write-Output $serverOutput.Trim()
-						Write-Output ""
-						break
-					} else {
-						$serverOutput += "$line`n"
-					}
-				}
-			}
 		}
 	}
-	
-	finally{
-		$stoparguments = "\\$ComputerName delete $ServiceName"
-		Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
-		if ($sw) { $sw.Close() }
-		if ($sr) { $sr.Close() }
-	}
-	
+
+	$stoparguments = "\\$ComputerName delete $ServiceName"
+	Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
+	$pipeClient.Disconnect()
+	$sr.Close()
+	$sr.Dispose()
+	$sw.Close()
+	$sw.Dispose()
+	$pipeClient.Close()
+	$pipeClient.Dispose()
 }
