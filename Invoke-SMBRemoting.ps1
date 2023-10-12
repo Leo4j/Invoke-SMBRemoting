@@ -74,7 +74,6 @@ while (`$true) {
 		break
 	}
 	`$command = `$sr.ReadLine()
-	`$host.UI.RawUI.BufferSize = New-Object Management.Automation.Host.Size(4096, `$Host.UI.RawUI.BufferSize.Height)
 	if (`$command -eq "exit") {break} 
 	else {
 		try{
