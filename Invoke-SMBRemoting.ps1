@@ -88,11 +88,6 @@ while (`$true) {
 	}
 }
 `$pipeServer.Disconnect()
-`$sr.Close()
-`$sr.Dispose()
-`$sw.Close()
-`$sw.Dispose()
-`$pipeServer.Close()
 `$pipeServer.Dispose()
 "@
 	
@@ -243,11 +238,6 @@ while (`$true) {
 
 	$stoparguments = "\\$ComputerName delete $ServiceName"
 	Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
-	$pipeClient.Disconnect()
-	$sr.Close()
-	$sr.Dispose()
-	$sw.Close()
-	$sw.Dispose()
 	$pipeClient.Close()
 	$pipeClient.Dispose()
 }
