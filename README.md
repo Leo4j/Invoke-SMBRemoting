@@ -5,7 +5,7 @@ Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the 
 
 Note: The user you run the script as needs to be administrator over the target system
 
-Run as follows:
+First, load the script in memory:
 
 ```
 iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/main/Invoke-SMBRemoting.ps1')
