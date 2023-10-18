@@ -99,7 +99,7 @@ while (`$true) {
 	
 	Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
 	
-	Start-Sleep -Milliseconds 200
+	Start-Sleep -Milliseconds 1000
 	
 	Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
 	
