@@ -1,4 +1,4 @@
-function Enter-SMBSession {
+function Invoke-SMBRemoting {
 	
 	<#
 
@@ -26,11 +26,11 @@ function Enter-SMBSession {
 	Show Pipe and Service Name info
 	
 	.EXAMPLE
-	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local"
-	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command whoami
-	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all"
- 	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
-	Enter-SMBSession -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local"
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command whoami
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all"
+ 	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
 	
 	#>
 
