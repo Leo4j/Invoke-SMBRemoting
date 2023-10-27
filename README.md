@@ -27,6 +27,7 @@ Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command whoami
 Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
 ```
 
-![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/5262c28a-f375-42ef-8f59-ddceb2edad8a)
+![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/645eaffe-e3d3-4428-b7a4-14bf95f5ddce)
+
 
 
