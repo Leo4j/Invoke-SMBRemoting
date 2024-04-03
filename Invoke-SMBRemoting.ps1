@@ -66,7 +66,11 @@ function Invoke-SMBRemoting {
 	
 	$ServerScript = @"
 `$pipeServer = New-Object System.IO.Pipes.NamedPipeServerStream("$PipeName", 'InOut', 1, 'Byte', 'None', 4096, 4096, `$null)
+`$tcb={param(`$state);`$state.Close()};
+`$tm = New-Object System.Threading.Timer(`$tcb, `$pipeServer, 600000, [System.Threading.Timeout]::Infinite);
 `$pipeServer.WaitForConnection()
+`$tm.Change([System.Threading.Timeout]::Infinite, [System.Threading.Timeout]::Infinite);
+`$tm.Dispose();
 `$sr = New-Object System.IO.StreamReader(`$pipeServer)
 `$sw = New-Object System.IO.StreamWriter(`$pipeServer)
 while (`$true) {
