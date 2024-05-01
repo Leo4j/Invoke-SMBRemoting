@@ -8,7 +8,9 @@ function Invoke-SMBRemoting {
 
 	.DESCRIPTION
 	Command Execution or Interactive Shell over Named-Pipes
-	The user you run the script as needs to be Administrator over the ComputerName
+
+ 	.REQUIREMENTS
+	Admin rights over the target Host
 	
 	.PARAMETER ComputerName
 	The Server HostName or IP to connect to
@@ -144,7 +146,7 @@ while (`$true) {
 	$b64monitoringScript = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($monitoringScript))
 	
 	# Execute the embedded monitoring script in a hidden window
-	Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -enc $b64monitoringScript" -WindowStyle Hidden
+	$MonitoringProcess = Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -enc $b64monitoringScript" -WindowStyle Hidden -PassThru
 	
 	$pipeClient = New-Object System.IO.Pipes.NamedPipeClientStream("$ComputerName", $PipeName, 'InOut')
 	
@@ -176,7 +178,7 @@ while (`$true) {
 			if ($line -eq "###END###") {
 				Write-Output $serverOutput.Trim()
 				Write-Output ""
-				return
+				break
 			} else {
 				$serverOutput += "$line`n"
 			}
@@ -224,8 +226,6 @@ while (`$true) {
 			else{
 				continue
 			}
-			
-			#Write-Output ""
 
 			$serverOutput = ""
 			while ($true) {
@@ -246,4 +246,5 @@ while (`$true) {
 	Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
 	$pipeClient.Close()
 	$pipeClient.Dispose()
+ 	Stop-Process -Id $MonitoringProcess.Id
 }
