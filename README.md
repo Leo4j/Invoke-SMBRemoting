@@ -18,13 +18,25 @@ Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local"
 ```
 Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService
 ```
+```
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -ModifyService -Verbose
+```
+```
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -ModifyService -ServiceName SensorService -Verbose
+```
 
 ### Command Execution
 ```
-Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command whoami
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all"
 ```
 ```
-Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -PipeName Something -ServiceName RandomService -Command whoami
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all" -PipeName Something -ServiceName RandomService
+```
+```
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all" -ModifyService
+```
+```
+Invoke-SMBRemoting -ComputerName "Workstation-01.ferrari.local" -Command "whoami /all" -ModifyService -ServiceName SensorService -Verbose
 ```
 
 ![image](https://github.com/Leo4j/Invoke-SMBRemoting/assets/61951374/645eaffe-e3d3-4428-b7a4-14bf95f5ddce)
