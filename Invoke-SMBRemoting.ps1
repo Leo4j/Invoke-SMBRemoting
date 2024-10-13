@@ -7,7 +7,7 @@ function Invoke-SMBRemoting {
 	https://github.com/Leo4j/Invoke-SMBRemoting
 
 	.DESCRIPTION
-	Command Execution or Interactive Shell over Named-Pipes
+	Interactive Shell and Command Execution over Named-Pipes (SMB) for Fileless lateral movement.
 
  	.REQUIREMENTS
 	Admin rights over the target Host
