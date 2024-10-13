@@ -1,5 +1,5 @@
 # Invoke-SMBRemoting
-Interactive Shell and Command Execution over Named-Pipes (SMB)
+Interactive Shell and Command Execution over Named-Pipes (SMB) for Fileless lateral movement.
 
 Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the target machine, and sends commands (and receives outputs) using Named Pipes.
 
