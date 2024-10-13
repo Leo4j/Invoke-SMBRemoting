@@ -1,9 +1,9 @@
 # Invoke-SMBRemoting
 Interactive Shell and Command Execution over Named-Pipes (SMB) for Fileless lateral movement.
 
-Invoke-SMBRemoting utilizes the SMB protocol to establish a connection with the target machine, and sends commands (and receives outputs) using Named Pipes.
+Invoke-SMBRemoting is a PowerShell tool that enables command execution or interactive shell access over Named Pipes (SMB) on a remote host. It leverages Windows services for fileless lateral movement by either creating or modifying a service on the target machine.
 
-Note: The user you run the script as needs to be administrator over the target system
+The tool supports specifying commands or establishing a persistent shell connection, and requires administrative rights on the target
 
 First, load the script in memory:
 
