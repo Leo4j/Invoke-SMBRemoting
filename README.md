@@ -5,8 +5,12 @@ Invoke-SMBRemoting enables remote command execution or interactive shell access 
 
 The tool supports specifying commands or establishing a persistent shell connection, and requires administrative rights on the target.
 
-First, load the script in memory:
+First, load the script in memory (V2):
 
+```
+iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/refs/heads/main/Invoke-SMBRemoting_V2.ps1')
+```
+Or use V1 if you don't like improvements:
 ```
 iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/Leo4j/Invoke-SMBRemoting/main/Invoke-SMBRemoting.ps1')
 ```
